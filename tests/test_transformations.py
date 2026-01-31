@@ -170,3 +170,31 @@ class TestMinPrefix:
         trace = []
         result = min_prefix(vec, 10, trace)
         assert result == [1, 1, 1]
+
+
+from src.transformations import TRANSFORMATIONS, get_transformation
+
+class TestRegistry:
+    def test_has_16_transformations(self):
+        assert len(TRANSFORMATIONS) == 16
+
+    def test_get_by_name(self):
+        fn = get_transformation("reverse")
+        assert fn is not None
+        vec = [1, 2, 3]
+        trace = []
+        result = fn(vec, 10, trace)
+        assert result == [3, 2, 1]
+
+    def test_get_by_index(self):
+        fn = get_transformation(0)
+        assert fn is not None
+
+    def test_all_names(self):
+        expected = [
+            "reverse", "sort_asc", "sort_desc", "cumsum",
+            "cumsum_reverse", "add_1", "add_2", "add_3",
+            "diff", "swap_pairs", "rotate_left", "rotate_right",
+            "negate", "double", "square", "min_prefix"
+        ]
+        assert list(TRANSFORMATIONS.keys()) == expected

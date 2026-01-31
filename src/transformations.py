@@ -7,7 +7,7 @@ Each transformation:
 - All values are mod k after operation
 """
 
-from typing import List
+from typing import Callable, List, Union
 
 
 def _format_vec(vec: List[int]) -> str:
@@ -172,3 +172,33 @@ def min_prefix(vec: List[int], k: int, trace: List[str]) -> List[int]:
         ops.append(f"min={running_min}")
     trace.append(f"min_prefix:{','.join(ops)}:{_format_vec(result)}")
     return result
+
+
+TransformFn = Callable[[List[int], int, List[str]], List[int]]
+
+TRANSFORMATIONS: dict[str, TransformFn] = {
+    "reverse": reverse,
+    "sort_asc": sort_asc,
+    "sort_desc": sort_desc,
+    "cumsum": cumsum,
+    "cumsum_reverse": cumsum_reverse,
+    "add_1": add_1,
+    "add_2": add_2,
+    "add_3": add_3,
+    "diff": diff,
+    "swap_pairs": swap_pairs,
+    "rotate_left": rotate_left,
+    "rotate_right": rotate_right,
+    "negate": negate,
+    "double": double,
+    "square": square,
+    "min_prefix": min_prefix,
+}
+
+
+def get_transformation(key: Union[str, int]) -> TransformFn:
+    """Get transformation by name or index."""
+    if isinstance(key, int):
+        name = list(TRANSFORMATIONS.keys())[key]
+        return TRANSFORMATIONS[name]
+    return TRANSFORMATIONS[key]
