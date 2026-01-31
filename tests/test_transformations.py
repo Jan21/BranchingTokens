@@ -1,6 +1,7 @@
 import pytest
 from src.transformations import reverse, sort_asc, sort_desc, cumsum, cumsum_reverse, add_1, add_2, add_3
 from src.transformations import diff, swap_pairs, rotate_left, rotate_right
+from src.transformations import negate, double, square, min_prefix
 
 class TestReverse:
     def test_basic(self):
@@ -129,3 +130,43 @@ class TestRotateRight:
         trace = []
         result = rotate_right(vec, 10, trace)
         assert result == [4, 3, 1]
+
+class TestNegate:
+    def test_basic(self):
+        vec = [3, 1, 4]
+        trace = []
+        result = negate(vec, 10, trace)
+        assert result == [7, 9, 6]  # k-x: 10-3=7, 10-1=9, 10-4=6
+
+class TestDouble:
+    def test_basic(self):
+        vec = [3, 1, 4]
+        trace = []
+        result = double(vec, 10, trace)
+        assert result == [6, 2, 8]
+
+    def test_modulo(self):
+        vec = [6, 1, 4]
+        trace = []
+        result = double(vec, 10, trace)
+        assert result == [2, 2, 8]  # 12 mod 10 = 2
+
+class TestSquare:
+    def test_basic(self):
+        vec = [3, 1, 4]
+        trace = []
+        result = square(vec, 10, trace)
+        assert result == [9, 1, 6]  # 9, 1, 16 mod 10 = 6
+
+class TestMinPrefix:
+    def test_basic(self):
+        vec = [3, 1, 4]
+        trace = []
+        result = min_prefix(vec, 10, trace)
+        assert result == [3, 1, 1]  # running min: 3, min(3,1)=1, min(1,4)=1
+
+    def test_already_increasing(self):
+        vec = [1, 2, 3]
+        trace = []
+        result = min_prefix(vec, 10, trace)
+        assert result == [1, 1, 1]

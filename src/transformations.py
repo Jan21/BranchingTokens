@@ -135,3 +135,40 @@ def rotate_right(vec: List[int], k: int, trace: List[str]) -> List[int]:
     result = vec[-1:] + vec[:-1]
     trace.append(f"rotate_right:{_format_vec(result)}")
     return result
+
+
+def negate(vec: List[int], k: int, trace: List[str]) -> List[int]:
+    """Negate: x -> k - x."""
+    result = [(k - x) % k for x in vec]
+    ops = [f"{k}-{x}={r}" for x, r in zip(vec, result)]
+    trace.append(f"negate:{','.join(ops)}:{_format_vec(result)}")
+    return result
+
+
+def double(vec: List[int], k: int, trace: List[str]) -> List[int]:
+    """Double all elements mod k."""
+    result = [(2 * x) % k for x in vec]
+    ops = [f"2*{x}={r}" for x, r in zip(vec, result)]
+    trace.append(f"double:{','.join(ops)}:{_format_vec(result)}")
+    return result
+
+
+def square(vec: List[int], k: int, trace: List[str]) -> List[int]:
+    """Square all elements mod k."""
+    result = [(x * x) % k for x in vec]
+    ops = [f"{x}^2={r}" for x, r in zip(vec, result)]
+    trace.append(f"square:{','.join(ops)}:{_format_vec(result)}")
+    return result
+
+
+def min_prefix(vec: List[int], k: int, trace: List[str]) -> List[int]:
+    """Running minimum."""
+    result = []
+    running_min = float('inf')
+    ops = []
+    for x in vec:
+        running_min = min(running_min, x)
+        result.append(running_min)
+        ops.append(f"min={running_min}")
+    trace.append(f"min_prefix:{','.join(ops)}:{_format_vec(result)}")
+    return result
