@@ -96,3 +96,42 @@ def add_3(vec: List[int], k: int, trace: List[str]) -> List[int]:
     ops = [f"{x}+3={r}" for x, r in zip(vec, result)]
     trace.append(f"add_3:{','.join(ops)}:{_format_vec(result)}")
     return result
+
+
+def diff(vec: List[int], k: int, trace: List[str]) -> List[int]:
+    """Pairwise differences. First element unchanged, rest are vec[i] - vec[i-1] mod k."""
+    result = [vec[0]]
+    ops = [str(vec[0])]
+    for i in range(1, len(vec)):
+        d = (vec[i] - vec[i - 1]) % k
+        ops.append(f"{vec[i]}-{vec[i-1]}={d}")
+        result.append(d)
+    trace.append(f"diff:{','.join(ops)}:{_format_vec(result)}")
+    return result
+
+
+def swap_pairs(vec: List[int], k: int, trace: List[str]) -> List[int]:
+    """Swap adjacent pairs. Odd-length vectors keep last element in place."""
+    result = list(vec)
+    swaps = []
+    for i in range(0, len(vec) - 1, 2):
+        result[i], result[i + 1] = result[i + 1], result[i]
+        swaps.append(f"({vec[i]},{vec[i+1]})->({result[i]},{result[i+1]})")
+    if len(vec) % 2 == 1:
+        swaps.append(f"{vec[-1]}->stays")
+    trace.append(f"swap_pairs:{','.join(swaps)}:{_format_vec(result)}")
+    return result
+
+
+def rotate_left(vec: List[int], k: int, trace: List[str]) -> List[int]:
+    """Rotate left by 1."""
+    result = vec[1:] + vec[:1]
+    trace.append(f"rotate_left:{_format_vec(result)}")
+    return result
+
+
+def rotate_right(vec: List[int], k: int, trace: List[str]) -> List[int]:
+    """Rotate right by 1."""
+    result = vec[-1:] + vec[:-1]
+    trace.append(f"rotate_right:{_format_vec(result)}")
+    return result
