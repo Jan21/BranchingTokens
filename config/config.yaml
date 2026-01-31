@@ -1,0 +1,20 @@
+seed: 42
+
+vector:
+  length: 8
+  k: 10
+
+graph:
+  d: 4
+  m: 4
+
+path:
+  min_len: 1
+  max_len: 4
+
+split:
+  train_ratio: 0.8
+
+dataset:
+  train_size: 10000
+  val_size: 2000
