@@ -1,5 +1,5 @@
 import pytest
-from src.transformations import reverse, sort_asc, sort_desc, cumsum
+from src.transformations import reverse, sort_asc, sort_desc, cumsum, cumsum_reverse, add_1, add_2, add_3
 
 class TestReverse:
     def test_basic(self):
@@ -54,3 +54,37 @@ class TestCumsum:
         trace = []
         cumsum(vec, 10, trace)
         assert "3+1=4" in trace[0] or "3,3+1=4" in trace[0]
+
+class TestCumsumReverse:
+    def test_basic(self):
+        vec = [3, 1, 4]
+        trace = []
+        result = cumsum_reverse(vec, 10, trace)
+        assert result == [8, 5, 4]  # 3+1+4=8, 1+4=5, 4
+
+class TestAdd1:
+    def test_basic(self):
+        vec = [3, 1, 4]
+        trace = []
+        result = add_1(vec, 10, trace)
+        assert result == [4, 2, 5]
+
+    def test_modulo(self):
+        vec = [9, 1, 4]
+        trace = []
+        result = add_1(vec, 10, trace)
+        assert result == [0, 2, 5]
+
+class TestAdd2:
+    def test_basic(self):
+        vec = [3, 1, 4]
+        trace = []
+        result = add_2(vec, 10, trace)
+        assert result == [5, 3, 6]
+
+class TestAdd3:
+    def test_basic(self):
+        vec = [3, 1, 4]
+        trace = []
+        result = add_3(vec, 10, trace)
+        assert result == [6, 4, 7]
