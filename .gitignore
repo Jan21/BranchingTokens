@@ -29,6 +29,10 @@ ENV/
 # Hydra outputs
 outputs/
 
+# Generated dataset files
+train.txt
+val.txt
+
 # IDE
 .idea/
 .vscode/
