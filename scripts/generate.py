@@ -2,6 +2,11 @@
 """Generate training and validation datasets using Hydra config."""
 
 import os
+import sys
+
+# Add project root to path so 'src' module can be found
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import hydra
 from omegaconf import DictConfig, OmegaConf
 
