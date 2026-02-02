@@ -7,31 +7,34 @@ from typing import Dict, List
 def parse_example_line(line: str, input_len: int) -> Dict:
     """Parse a formatted example line.
 
-    Format: "INPUT OUTPUT TRACE" where INPUT and OUTPUT are space-separated ints.
+    Format: "ST : [ INPUT ] ; BEGIN : TRACE ; RESULT : [ OUTPUT ]"
 
     Args:
         line: The formatted line
-        input_len: Length of input/output vectors (needed to know where trace starts)
+        input_len: Length of input/output vectors (needed for validation)
 
     Returns:
         Dict with input, output, trace keys
     """
-    parts = line.strip().split()
+    line = line.strip()
 
-    input_vec = [int(x) for x in parts[:input_len]]
+    # Extract input vector (between "ST : [" and "] ;")
+    input_match = re.search(r'ST : \[ (.*?) \] ;', line)
+    if not input_match:
+        raise ValueError("Could not find input vector in line")
+    input_vec = [int(x) for x in input_match.group(1).split()]
 
-    # Find where trace starts (first non-integer token after input)
-    trace_start = input_len
-    for i in range(input_len, len(parts)):
-        try:
-            int(parts[i])
-            trace_start = i + 1
-        except ValueError:
-            trace_start = i
-            break
+    # Extract trace (between "BEGIN :" and "; RESULT")
+    trace_match = re.search(r'BEGIN : (.*?) ; RESULT', line)
+    if not trace_match:
+        raise ValueError("Could not find trace in line")
+    trace = trace_match.group(1)
 
-    output_vec = [int(x) for x in parts[input_len:trace_start]]
-    trace = " ".join(parts[trace_start:])
+    # Extract output vector (between "RESULT : [" and "]")
+    output_match = re.search(r'RESULT : \[ (.*?) \]', line)
+    if not output_match:
+        raise ValueError("Could not find output vector in line")
+    output_vec = [int(x) for x in output_match.group(1).split()]
 
     return {
         "input": input_vec,
@@ -49,8 +52,8 @@ def parse_coarse(trace: str) -> List[str]:
     Returns:
         List of transformation names in order
     """
-    # Each transformation trace starts with "name:" where name begins with a letter
-    pattern = r'([a-z_][a-z_0-9]*):'
+    # Each transformation trace starts with "name :" where name begins with a letter
+    pattern = r'([a-z_][a-z_0-9]*) :'
     matches = re.findall(pattern, trace)
     return matches
 
@@ -64,13 +67,13 @@ def parse_medium(trace: str) -> List[List[int]]:
     Returns:
         List of result vectors (one per transformation)
     """
-    # Find all [...] patterns (result vectors)
-    pattern = r'\[([0-9,]+)\]'
+    # Find all [ ... ] patterns (result vectors with space-separated numbers)
+    pattern = r'\[ ([\d\s]+) \]'
     matches = re.findall(pattern, trace)
 
     vectors = []
     for match in matches:
-        vec = [int(x) for x in match.split(',')]
+        vec = [int(x) for x in match.split()]
         vectors.append(vec)
 
     return vectors
@@ -85,30 +88,21 @@ def parse_fine(trace: str) -> List[Dict]:
     Returns:
         List of dicts with name and operations for each transformation
     """
-    # Split by transformation (each starts with name:)
-    parts = trace.strip().split()
+    # Split trace into individual transformations using regex
+    # Each transformation starts with "name :" and contains operations and a result vector
+    pattern = r'([a-z_][a-z_0-9]*) : (.*?) : \[ ([\d\s]+) \]'
+    matches = re.finditer(pattern, trace)
 
     results = []
-    for part in parts:
-        if ':' not in part:
-            continue
-
-        # Split into name and rest
-        colon_idx = part.index(':')
-        name = part[:colon_idx]
-        rest = part[colon_idx + 1:]
-
-        # Extract operations (everything before the final [...])
-        bracket_idx = rest.rfind('[')
-        if bracket_idx > 0:
-            ops_str = rest[:bracket_idx].rstrip(':')
-            operations = ops_str
-        else:
-            operations = ""
+    for match in matches:
+        name = match.group(1)
+        operations = match.group(2).strip()  # Operations string (may be empty)
+        result_vec = [int(x) for x in match.group(3).split()]
 
         results.append({
             "name": name,
             "operations": operations,
+            "result": result_vec,
         })
 
     return results

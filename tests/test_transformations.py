@@ -55,7 +55,7 @@ class TestCumsum:
         vec = [3, 1, 4]
         trace = []
         cumsum(vec, 10, trace)
-        assert "3+1=4" in trace[0] or "3,3+1=4" in trace[0]
+        assert "3 + 1 = 4" in trace[0] or "3 , 3 + 1 = 4" in trace[0]
 
 class TestCumsumReverse:
     def test_basic(self):
