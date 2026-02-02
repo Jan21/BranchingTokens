@@ -54,7 +54,11 @@ class TestExampleGeneration:
             seed=42
         )
         formatted = example["formatted"]
-        # Format: "INPUT OUTPUT TRACE"
+        # Format: "INPUT: ... OUTPUT: ... TRACE: ... </s>"
+        assert "INPUT:" in formatted
+        assert "OUTPUT:" in formatted
+        assert "TRACE:" in formatted
+        assert formatted.endswith("</s>")
+        # Check all parts are whitespace tokenizable
         parts = formatted.split()
-        # Should have: 3 input + 3 output + 1 trace = 7 parts minimum
-        assert len(parts) >= 7
+        assert len(parts) >= 11  # INPUT: + 3 input + OUTPUT: + 3 output + TRACE: + trace tokens + </s>

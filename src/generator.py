@@ -49,12 +49,12 @@ def generate_example(
 
     output_vec = current
 
-    # Format: "INPUT OUTPUT TRACE"
+    # Format: "INPUT: ... OUTPUT: ... TRACE: ..."
     input_str = " ".join(str(x) for x in input_vec)
     output_str = " ".join(str(x) for x in output_vec)
-    trace_str = " ".join(trace)
+    trace_str = " ; ".join(trace)
 
-    formatted = f"{input_str} {output_str} {trace_str}"
+    formatted = f"INPUT: {input_str} OUTPUT: {output_str} TRACE: {trace_str} </s>"
 
     return {
         "input": input_vec,

@@ -1,7 +1,7 @@
 seed: 42
 
 vector:
-  length: 8
+  length: 4
   k: 10
 
 graph:

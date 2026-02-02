@@ -4,39 +4,48 @@ import re
 from typing import Dict, List
 
 
-def parse_example_line(line: str, input_len: int) -> Dict:
+def parse_example_line(line: str, input_len: int = None) -> Dict:
     """Parse a formatted example line.
 
-    Format: "INPUT OUTPUT TRACE" where INPUT and OUTPUT are space-separated ints.
+    Format: "INPUT: ... OUTPUT: ... TRACE: ..."
 
     Args:
         line: The formatted line
-        input_len: Length of input/output vectors (needed to know where trace starts)
+        input_len: Unused, kept for backward compatibility
 
     Returns:
         Dict with input, output, trace keys
     """
-    parts = line.strip().split()
+    # Find the keyword positions
+    input_match = re.search(r'INPUT:', line)
+    output_match = re.search(r'OUTPUT:', line)
+    trace_match = re.search(r'TRACE:', line)
 
-    input_vec = [int(x) for x in parts[:input_len]]
+    if not all([input_match, output_match, trace_match]):
+        raise ValueError(f"Invalid format, missing INPUT:/OUTPUT:/TRACE: keywords in: {line}")
 
-    # Find where trace starts (first non-integer token after input)
-    trace_start = input_len
-    for i in range(input_len, len(parts)):
-        try:
-            int(parts[i])
-            trace_start = i + 1
-        except ValueError:
-            trace_start = i
-            break
+    # Extract content between keywords
+    input_start = input_match.end()
+    input_end = output_match.start()
+    input_str = line[input_start:input_end].strip()
 
-    output_vec = [int(x) for x in parts[input_len:trace_start]]
-    trace = " ".join(parts[trace_start:])
+    output_start = output_match.end()
+    output_end = trace_match.start()
+    output_str = line[output_start:output_end].strip()
+
+    trace_start = trace_match.end()
+    trace_str = line[trace_start:].strip()
+    if trace_str.endswith('</s>'):
+        trace_str = trace_str[:-4].strip()
+
+    # Parse vectors
+    input_vec = [int(x) for x in input_str.split()]
+    output_vec = [int(x) for x in output_str.split()]
 
     return {
         "input": input_vec,
         "output": output_vec,
-        "trace": trace,
+        "trace": trace_str,
     }
 
 
@@ -49,8 +58,8 @@ def parse_coarse(trace: str) -> List[str]:
     Returns:
         List of transformation names in order
     """
-    # Each transformation trace starts with "name:" where name begins with a letter
-    pattern = r'([a-z_][a-z_0-9]*):'
+    # Each transformation trace starts with "name :" (name followed by space and colon)
+    pattern = r'([a-z_][a-z_0-9]*) :'
     matches = re.findall(pattern, trace)
     return matches
 
@@ -64,13 +73,16 @@ def parse_medium(trace: str) -> List[List[int]]:
     Returns:
         List of result vectors (one per transformation)
     """
-    # Find all [...] patterns (result vectors)
-    pattern = r'\[([0-9,]+)\]'
+    # Find all [ ... ] patterns (result vectors with spaced format)
+    # Pattern matches: [ 1 , 2 , 3 ]
+    pattern = r'\[ ([\d\s,]+) \]'
     matches = re.findall(pattern, trace)
 
     vectors = []
     for match in matches:
-        vec = [int(x) for x in match.split(',')]
+        # Parse "1 , 2 , 3" format
+        parts = match.split(',')
+        vec = [int(x.strip()) for x in parts]
         vectors.append(vec)
 
     return vectors
@@ -85,30 +97,42 @@ def parse_fine(trace: str) -> List[Dict]:
     Returns:
         List of dicts with name and operations for each transformation
     """
-    # Split by transformation (each starts with name:)
-    parts = trace.strip().split()
+    # Split into individual transformation blocks
+    # Each block starts with "name : " and ends before the next "name :"
+    # Pattern: transformation_name : [ops :] [ result ]
 
     results = []
-    for part in parts:
-        if ':' not in part:
-            continue
 
-        # Split into name and rest
-        colon_idx = part.index(':')
-        name = part[:colon_idx]
-        rest = part[colon_idx + 1:]
+    # Find all transformation names and their positions
+    name_pattern = r'([a-z_][a-z_0-9]*) :'
+    name_matches = list(re.finditer(name_pattern, trace))
 
-        # Extract operations (everything before the final [...])
-        bracket_idx = rest.rfind('[')
-        if bracket_idx > 0:
-            ops_str = rest[:bracket_idx].rstrip(':')
-            operations = ops_str
+    for i, match in enumerate(name_matches):
+        name = match.group(1)
+
+        # Get the content after this name until the next name (or end)
+        start = match.end()
+        if i + 1 < len(name_matches):
+            end = name_matches[i + 1].start()
         else:
-            operations = ""
+            end = len(trace)
+
+        content = trace[start:end].strip().rstrip(';').strip()
+
+        # Find the result vector (last [ ... ] in content)
+        vec_pattern = r'\[ [\d\s,]+ \]'
+        vec_matches = list(re.finditer(vec_pattern, content))
+
+        if vec_matches:
+            # Operations are everything before the last vector
+            last_vec_start = vec_matches[-1].start()
+            ops_str = content[:last_vec_start].rstrip(' :')
+        else:
+            ops_str = ""
 
         results.append({
             "name": name,
-            "operations": operations,
+            "operations": ops_str,
         })
 
     return results
