@@ -10,11 +10,16 @@ graph:
 
 path:
   min_len: 1
-  max_len: 4
+  max_len: 2
 
 split:
-  train_ratio: 0.8
+  train_ratio: 0.78125  # 200/256 -> exactly 200 train, 56 test for length-2 combos
+  all_train_lengths: [1]  # lengths where ALL paths go to train (no split)
 
 dataset:
-  train_size: 10000
-  val_size: 2000
+  mode: combinations  # all function combinations (16×16), no graph constraint
+  train_size: 500000
+  val_size: 5000
+  balanced: true
+  per_length:
+    1: 160000   # all 1-op paths (16 ops × 10k inputs), remaining 340k filled with 2-op

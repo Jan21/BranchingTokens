@@ -1,5 +1,8 @@
 # Worktrees
 .worktrees/
+training/data/*
+training/wandb
+training/temp
 
 # Python
 __pycache__/

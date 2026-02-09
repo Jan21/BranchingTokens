@@ -25,7 +25,8 @@ def generate_example(
     path: Tuple[str, ...],
     vector_length: int,
     k: int,
-    seed: int
+    seed: int,
+    fixed_input: List[int] = None
 ) -> Dict:
     """Generate a single training/validation example.
 
@@ -34,11 +35,15 @@ def generate_example(
         vector_length: Length of input vector
         k: Modulo value
         seed: Random seed for vector generation
+        fixed_input: Optional fixed input vector (overrides random generation)
 
     Returns:
         Dict with keys: input, output, trace, formatted
     """
-    input_vec = generate_vector(vector_length, k, seed)
+    if fixed_input is not None:
+        input_vec = list(fixed_input)
+    else:
+        input_vec = generate_vector(vector_length, k, seed)
 
     current = list(input_vec)
     trace = []
@@ -49,16 +54,20 @@ def generate_example(
 
     output_vec = current
 
-    # Format: "INPUT: ... OUTPUT: ... TRACE: ..."
-    input_str = " ".join(str(x) for x in input_vec)
-    output_str = " ".join(str(x) for x in output_vec)
+    # Format compatible with clean_framework
+    # Framework expects: {"input": "...", "output": "..."}
+    # Framework will tokenize as: [BOS] input [OUT] output [EOS]
+    input_str = " , ".join(str(x) for x in input_vec)
+    output_str = " , ".join(str(x) for x in output_vec)
     trace_str = " ; ".join(trace)
 
-    formatted = f"INPUT: {input_str} OUTPUT: {output_str} TRACE: {trace_str} </s>"
+    # Input includes: INPUT : <vec> OUTPUT : <vec>
+    # Output is just the trace
+    # Framework adds [OUT] between them and model predicts only the trace
+    formatted_input = f"INPUT : [ {input_str} ] , OUTPUT : [ {output_str} ]"
 
     return {
-        "input": input_vec,
-        "output": output_vec,
+        "input": formatted_input,
+        "output": trace_str,
         "trace": trace,
-        "formatted": formatted,
     }

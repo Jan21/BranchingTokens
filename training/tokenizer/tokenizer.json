@@ -1,0 +1,108 @@
+{
+  "version": "1.0",
+  "truncation": null,
+  "padding": null,
+  "added_tokens": [
+    {
+      "id": 44,
+      "content": "[BOS]",
+      "single_word": false,
+      "lstrip": false,
+      "rstrip": false,
+      "normalized": false,
+      "special": true
+    },
+    {
+      "id": 45,
+      "content": "[PAD]",
+      "single_word": false,
+      "lstrip": false,
+      "rstrip": false,
+      "normalized": false,
+      "special": true
+    },
+    {
+      "id": 46,
+      "content": "[MASK]",
+      "single_word": false,
+      "lstrip": false,
+      "rstrip": false,
+      "normalized": false,
+      "special": true
+    },
+    {
+      "id": 47,
+      "content": "[UNK]",
+      "single_word": false,
+      "lstrip": false,
+      "rstrip": false,
+      "normalized": false,
+      "special": true
+    },
+    {
+      "id": 48,
+      "content": "[EOS]",
+      "single_word": false,
+      "lstrip": false,
+      "rstrip": false,
+      "normalized": false,
+      "special": true
+    }
+  ],
+  "normalizer": null,
+  "pre_tokenizer": {
+    "type": "WhitespaceSplit"
+  },
+  "post_processor": null,
+  "decoder": null,
+  "model": {
+    "type": "WordLevel",
+    "vocab": {
+      "min_prefix": 0,
+      "->": 1,
+      "3": 2,
+      "*": 3,
+      "[TRACE]": 4,
+      ",": 5,
+      "^": 6,
+      "8": 7,
+      ":": 8,
+      "+": 9,
+      "add_2": 10,
+      "cumsum": 11,
+      "diff": 12,
+      "4": 13,
+      "10": 14,
+      "min": 15,
+      "5": 16,
+      "rotate_right": 17,
+      ";": 18,
+      "add_3": 19,
+      "(": 20,
+      "6": 21,
+      "add_1": 22,
+      "reverse": 23,
+      "negate": 24,
+      ")": 25,
+      "square": 26,
+      "0": 27,
+      "cumsum_reverse": 28,
+      "[": 29,
+      "-": 30,
+      "]": 31,
+      "sort_asc": 32,
+      "swap_pairs": 33,
+      "sort_desc": 34,
+      "double": 35,
+      "2": 36,
+      "1": 37,
+      "OUTPUT": 38,
+      "=": 39,
+      "rotate_left": 40,
+      "9": 41,
+      "INPUT": 42,
+      "7": 43
+    },
+    "unk_token": "[UNK]"
+  }
+}

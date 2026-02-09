@@ -1,0 +1,26 @@
+# Experiment 1: Exhaustive Single Operations
+# All possible (input, operation) pairs for single operations
+# Total: 10^4 inputs × 16 operations = 160,000 examples
+
+seed: 42
+
+vector:
+  length: 4
+  k: 10
+
+graph:
+  d: 4
+  m: 4
+
+path:
+  min_len: 1
+  max_len: 1  # Single operations only
+
+split:
+  train_ratio: 0.875  # 140k train / 160k total = 0.875
+
+dataset:
+  mode: exhaustive  # Generate ALL possible (input, operation) pairs
+  train_size: 140000
+  val_size: 20000
+  # No 'balanced' - exhaustive mode generates everything

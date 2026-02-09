@@ -1,0 +1,39 @@
+# Experiment 2: Mixed Train (1+2 ops), Pure Test (2 ops)
+# Train: 50% 1-op, 50% 2-op (balanced by sequence length)
+# Test: 100% 2-op
+# No input overlap between train and test
+
+seed: 42
+
+vector:
+  length: 4
+  k: 10
+
+graph:
+  d: 4
+  m: 4
+
+path:
+  min_len: 1
+  max_len: 2  # 1-op and 2-op only
+
+split:
+  train_ratio: 0.8  # Not used in this mode - see dataset.train_test_split_inputs
+
+dataset:
+  mode: mixed_train_pure_test  # Special mode for experiment 2
+
+  # Total number of examples (easily configurable!)
+  train_size: 500000
+  val_size: 5000  # val = test in this experiment
+  val_1op_size: 1500  # How many val examples use 1-op (rest are 2-op)
+
+  # Balancing rules:
+  # - Train: Uses all available unique 1-op pairs, fills rest with 2-op
+  #   (if enough 1-op exist, defaults to 50/50 split)
+  # - Test/Val: 2-op + optional 1-op (controlled by val_1op_size)
+  # - 1-op train: exhaustive unique (input, operation) pairs
+  # - 2-op: uniformly sampled (balanced by OPERATION)
+  # - Input separation: train and test use DISJOINT sets of input vectors
+
+  train_test_split_inputs: 0.67  # 67% of input space for train, 33% for test
